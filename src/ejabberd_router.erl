@@ -39,6 +39,7 @@
          unregister_routes/1,
          dirty_get_all_routes/0,
          dirty_get_all_domains/0,
+         dirty_get_routes_to_module/1,
          register_components/2,
          register_components/3,
          register_component/2,
@@ -323,6 +324,11 @@ dirty_get_all_routes() ->
 
 dirty_get_all_domains() ->
     lists:usort(all_routes()).
+
+-spec dirty_get_routes_to_module(atom()) -> [binary()].
+dirty_get_routes_to_module(Mod) ->
+    Routes = mnesia:dirty_match_object(#route{domain = '_', handler = {packet_handler, Mod, '_'}}),
+    lists:map(fun(#route{domain = Domain}) -> Domain end, Routes).
 
 all_routes() ->
     mnesia:dirty_all_keys(route) ++ mnesia:dirty_all_keys(external_component_global).
