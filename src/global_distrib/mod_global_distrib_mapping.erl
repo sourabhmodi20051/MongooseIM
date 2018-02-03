@@ -120,6 +120,7 @@ all_domains() ->
 endpoints(Host) ->
     mod_global_distrib_mapping_backend:get_endpoints(Host).
 
+-spec hosts() -> [Host :: jid:lserver()].
 hosts() ->
     mod_global_distrib_mapping_backend:get_hosts().
 
