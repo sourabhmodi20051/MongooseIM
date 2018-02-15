@@ -37,6 +37,16 @@ get_connection(Server) ->
     ensure_server_started(Server),
     mod_global_distrib_server_sup:get_connection(Server).
 
+-spec ensure_server_started(Server :: jid:lserver()) -> ok.
+ensure_server_started(Server) ->
+    case whereis(mod_global_distrib_utils:server_to_sup_name(Server)) of
+        undefined ->
+            ?DEBUG("Host ~p didn't have a corresponding supervisor", [Server]),
+            ok = add_server(Server);
+        _ -> ok
+    end,
+    ok.
+
 %%--------------------------------------------------------------------
 %% supervisor callback
 %%--------------------------------------------------------------------
@@ -46,15 +56,3 @@ init(_) ->
     SupFlags = #{ strategy => one_for_one, intensity => 5, period => 5 },
     {ok, {SupFlags, []}}.
 
-%%--------------------------------------------------------------------
-%% Helpers
-%%--------------------------------------------------------------------
-
-ensure_server_started(Server) ->
-  case whereis(mod_global_distrib_utils:server_to_sup_name(Server)) of
-    undefined ->
-      ?DEBUG("Host ~p didn't have a corresponding supervisor", [Server]),
-      ok = add_server(Server);
-    _ -> ok
-  end,
-  ok.
